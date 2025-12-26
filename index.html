@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>ALMA STORE | Início</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f6f6f6;
+      color: #111;
+      text-align: center;
+    }
+
+    header {
+      background: #fff;
+      padding: 50px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    }
+
+    h1 {
+      font-size: 48px;
+      margin: 0;
+      letter-spacing: 3px;
+    }
+
+    .logo {
+      margin-top: 12px;
+      opacity: .8;
+    }
+
+    main {
+      padding: 40px 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,.05);
+    }
+
+    .card h2 {
+      margin-top: 0;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #000;
+      color: #fff;
+      font-size: 15px;
+      margin-top: 10px;
+    }
+
+    button.outline {
+      background: transparent;
+      color: #000;
+      border: 2px solid #000;
+    }
+
+    footer {
+      margin-top: 40px;
+      padding: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>ALMA STORE</h1>
+  <img src="/logo.svg" class="logo" width="72" alt="ALMA logo">
+</header>
+
+<main>
+
+  <!-- AÇÕES PRINCIPAIS -->
+  <section class="grid">
+
+    <div class="card">
+      <h2>📦 Produtos Digitais</h2>
+      <p>Ebooks, cursos, beats, arquivos e muito mais.</p>
+      <button onclick="location.href='/digitaisproduct'">
+        Ver Digitais
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>📦 Produtos Físicos</h2>
+      <p>Roupas, acessórios, itens artesanais.</p>
+      <button onclick="location.href='/fisicos'">
+        Ver Físicos
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>🏪 Vender na ALMA</h2>
+      <p>Crie sua loja e comece a vender hoje.</p>
+      <button onclick="location.href='/openloja'">
+        Abrir Loja
+      </button>
+    </div>
+
+    <div class="card" id="authCard">
+      <h2>👤 Conta</h2>
+      <p>Entre ou crie sua conta.</p>
+
+      <button onclick="login('google')">Google</button>
+      <button onclick="login('facebook')">Facebook</button>
+      <br>
+      <button class="outline" onclick="location.href='/cadastro'">
+        Criar conta
+      </button>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  © 2025 — ALMA STORE · Venda com alma
+</footer>
+
+<script>
+  // 🔑 INSERIR KEYS AQUI
+  const SUPABASE_URL = "SUA_URL_SUPABASE";
+  const SUPABASE_ANON_KEY = "SUA_ANON_KEY";
+
+  const supabase = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  async function login(provider) {
+    await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: window.location.origin + "/inicio"
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
