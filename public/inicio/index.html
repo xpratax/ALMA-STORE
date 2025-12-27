@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>ALMA STORE | Início</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Favicon da raiz -->
+  <link rel="icon" href="/favicon.ico">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f6f6f6;
+    }
+
+    header {
+      background: #fff;
+      padding: 15px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand img {
+      width: 32px;
+    }
+
+    .brand span {
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    nav a {
+      margin-left: 15px;
+      text-decoration: none;
+      color: #000;
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .hero {
+      background: #000;
+      color: #fff;
+      padding: 40px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    .hero p {
+      margin-top: 10px;
+      font-size: 15px;
+      opacity: .8;
+    }
+
+    .filters {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .filters button {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,.06);
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .card p {
+      font-size: 13px;
+      color: #666;
+      margin: 6px 0;
+    }
+
+    .price {
+      font-weight: bold;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">
+    <img src="/logo.svg" alt="ALMA">
+    <span>ALMA STORE</span>
+  </div>
+
+  <nav>
+    <a href="/inicio">Início</a>
+    <a href="/digitaisproduct">Digitais</a>
+    <a href="/fisicos">Físicos</a>
+    <a href="/openloja">Abrir loja</a>
+    <a href="/cadastro">Conta</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <div class="hero">
+    <h1>Compre e venda com alma</h1>
+    <p>Produtos digitais e físicos em um só lugar</p>
+  </div>
+
+  <div class="filters">
+    <button onclick="filtrar('todos')">Todos</button>
+    <button onclick="filtrar('digital')">Digitais</button>
+    <button onclick="filtrar('fisico')">Físicos</button>
+  </div>
+
+  <div class="grid" id="produtos">
+    <!-- produtos entram aqui -->
+  </div>
+
+</div>
+
+<script>
+  // 🔑 KEYS AQUI DEPOIS
+const SUPABASE_URL = "https://dzwerhytdemnwebqurau.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6d2VyaHl0ZGVtbndlYnF1cmF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NzQ5NzEsImV4cCI6MjA4MjM1MDk3MX0.m0ZEcR_A7uEMJ0ixVThqNcI0lLlc2vCQitcyjtT0MDM";
+  const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  // mock inicial (depois vem do Supabase)
+  const produtosMock = [
+    { nome: "E-book Criativo", tipo: "digital", loja: "Loja X", valor: "R$ 19,90" },
+    { nome: "Preset Fotográfico", tipo: "digital", loja: "Visual Lab", valor: "R$ 29,90" },
+    { nome: "Camiseta Street", tipo: "fisico", loja: "Rua 013", valor: "R$ 79,90" }
+  ];
+
+  function render(lista) {
+    const box = document.getElementById('produtos');
+    box.innerHTML = '';
+
+    lista.forEach(p => {
+      box.innerHTML += `
+        <div class="card">
+          <h3>${p.nome}</h3>
+          <p>${p.loja}</p>
+          <p>${p.tipo}</p>
+          <div class="price">${p.valor}</div>
+        </div>
+      `;
+    });
+  }
+
+  window.filtrar = function (tipo) {
+    if (tipo === 'todos') {
+      render(produtosMock);
+    } else {
+      render(produtosMock.filter(p => p.tipo === tipo));
+    }
+  }
+
+  render(produtosMock);
+</script>
+
+</body>
+</html>
