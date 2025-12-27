@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>ALMA STORE | Abrir Loja</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- FAVICON IMPORTADO DA RAIZ -->
+  <link rel="icon" href="/favicon.png">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f6f6f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .box {
+      background: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.08);
+      text-align: center;
+    }
+
+    .logo {
+      width: 80px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      letter-spacing: 2px;
+    }
+
+    p {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: none;
+      height: 80px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      border: none;
+      background: #000;
+      color: #fff;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .msg {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+
+  <!-- LOGO IMPORTADO DA RAIZ -->
+  <img src="/logo.svg" alt="ALMA STORE" class="logo">
+
+  <h1>ALMA</h1>
+  <p>Abra sua loja e comece a vender com alma</p>
+
+  <input type="text" id="nomeLoja" placeholder="Nome da loja" />
+  <textarea id="descricao" placeholder="Descrição da loja"></textarea>
+
+  <button onclick="abrirLoja()">Criar loja</button>
+
+  <div class="msg" id="msg"></div>
+
+</div>
+
+<script>
+  // 🔑 INSERIR KEYS DO SUPABASE
+  const SUPABASE_URL = "SUA_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "SUA_SUPABASE_ANON_KEY";
+
+  const supabase = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  async function abrirLoja() {
+    const nomeLoja = document.getElementById('nomeLoja').value;
+    const descricao = document.getElementById('descricao').value;
+    const msg = document.getElementById('msg');
+
+    msg.innerText = "Criando loja...";
+
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      msg.innerText = "Você precisa estar logado";
+      msg.style.color = "red";
+      return;
+    }
+
+    const { error } = await supabase
+      .from('lojas')
+      .insert([{
+        user_id: user.id,
+        nome: nomeLoja,
+        descricao: descricao
+      }]);
+
+    if (error) {
+      msg.innerText = error.message;
+      msg.style.color = "red";
+    } else {
+      msg.innerText = "Loja criada com sucesso 🖤";
+      msg.style.color = "green";
+    }
+  }
+</script>
+
+</body>
+</html>
