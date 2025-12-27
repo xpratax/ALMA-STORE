@@ -96,32 +96,33 @@
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6d2VyaHl0ZGVtbndlYnF1cmF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NzQ5NzEsImV4cCI6MjA4MjM1MDk3MX0.m0ZEcR_A7uEMJ0ixVThqNcI0lLlc2vCQitcyjtT0MDM";
 
 
-  const supabase = supabase.createClient(
+ const supabaseClient = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
 
-  async function cadastrar() {
+  // 🔓 expõe globalmente
+  window.cadastrar = async function () {
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
     const msg = document.getElementById('msg');
 
-    msg.innerText = 'Criando conta...';
+    msg.innerText = "Criando conta...";
 
-    const { error } = await supabase.auth.signUp({
-      email: email,
+    const { error } = await supabaseClient.auth.signUp({
+      email,
       password: senha
     });
 
     if (error) {
       msg.innerText = error.message;
-      msg.style.color = 'red';
+      msg.style.color = "red";
     } else {
-      msg.innerText = 'Conta criada! Verifique seu email 💌';
-      msg.style.color = 'green';
+      msg.innerText = "Conta criada! Verifique seu email 💌";
+      msg.style.color = "green";
     }
   }
 </script>
-
+  
 </body>
 </html>
