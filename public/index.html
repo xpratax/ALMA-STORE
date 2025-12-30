@@ -116,26 +116,23 @@
   const SUPABASE_URL = "https://dzwerhytdemnwebqurau.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6d2VyaHl0ZGVtbndlYnF1cmF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NzQ5NzEsImV4cCI6MjA4MjM1MDk3MX0.m0ZEcR_A7uEMJ0ixVThqNcI0lLlc2vCQitcyjtT0MDM";
 
-  const supabaseClient = supabase.createClient(
+ const supabaseClient = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
 
-  // 🔓 LOGIN + REDIRECIONAMENTO
-  async function handleAction(destino) {
-    localStorage.setItem('redirectAfterLogin', destino);
+  window.addEventListener('load', async () => {
+    const { data } = await supabaseClient.auth.getSession();
 
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin + '/inicio'
+    if (data.session) {
+      const destino = localStorage.getItem('redirectAfterLogin');
+
+      if (destino && destino !== window.location.pathname) {
+        localStorage.removeItem('redirectAfterLogin');
+        window.location.href = destino;
       }
-    });
-
-    if (error) {
-      alert(error.message);
     }
-  }
+  });
 </script>
 
 </body>
