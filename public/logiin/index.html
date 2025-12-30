@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>ALMA STORE | Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Favicon da raiz -->
+  <link rel="icon" href="/favicon.png">
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f6f6f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .box {
+      background: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.08);
+      text-align: center;
+    }
+
+    .logo {
+      width: 72px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      letter-spacing: 2px;
+    }
+
+    p {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 16px;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .btn-login {
+      background: #000;
+      color: #fff;
+    }
+
+    .btn-google {
+      background: #fff;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .msg {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    a {
+      display: block;
+      margin-top: 15px;
+      font-size: 14px;
+      color: #000;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+
+  <img src="https://i.postimg.cc/T2BSsDWd/icons8-fantasma-50.png" class="logo" alt="ALMA logo">
+
+  <h1>ALMA</h1>
+  <p>Entre na sua conta</p>
+
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Senha">
+
+  <button class="btn-login" onclick="loginEmail()">Entrar</button>
+
+  <button class="btn-google" onclick="loginGoogle()">
+    <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="18">
+    Entrar com Google
+  </button>
+
+  <div class="msg" id="msg"></div>
+
+  <a href="/cadastro">Criar conta</a>
+
+</div>
+
+<script>
+  // 🔑 MESMAS KEYS
+  const SUPABASE_URL = "https://dzwerhytdemnwebqurau.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6d2VyaHl0ZGVtbndlYnF1cmF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NzQ5NzEsImV4cCI6MjA4MjM1MDk3MX0.m0ZEcR_A7uEMJ0ixVThqNcI0lLlc2vCQitcyjtT0MDM";
+
+  const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  // 📧 LOGIN EMAIL
+  window.loginEmail = async function () {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const msg = document.getElementById("msg");
+
+    msg.innerText = "Entrando...";
+
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      msg.innerText = error.message;
+      msg.style.color = "red";
+    } else {
+      window.location.href = "/inicio";
+    }
+  }
+
+  // 🔐 LOGIN GOOGLE
+  window.loginGoogle = async function () {
+    await supabaseClient.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + "/inicio"
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
