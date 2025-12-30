@@ -8,6 +8,7 @@
   <!-- Favicon da raiz -->
   <link rel="icon" href="/favicon.png">
 
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -76,7 +77,8 @@
     .filters {
       display: flex;
       gap: 15px;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
     .filters button {
@@ -86,6 +88,15 @@
       background: #fff;
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    }
+
+    .search {
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      margin-bottom: 25px;
+      font-size: 15px;
     }
 
     .grid {
@@ -123,7 +134,7 @@
 
 <header>
   <div class="brand">
-   <img src="https://i.postimg.cc/T2BSsDWd/icons8-fantasma-50.png" class="logo" width="72" alt="ALMA logo">
+    <img src="https://i.postimg.cc/T2BSsDWd/icons8-fantasma-50.png" alt="ALMA logo">
     <span>ALMA STORE</span>
   </div>
 
@@ -131,8 +142,8 @@
     <a href="/inicio">Início</a>
     <a href="/digitaisproduct">Digitais</a>
     <a href="/fisicos">Físicos</a>
-    <a href="/minha-loja">loja</a>
-    <a href="/openloja">Abrir loja</a>
+    <a href="/minha-loja">Minha Loja</a>
+    <a href="/openloja">Abrir Loja</a>
     <a href="/cadastro">Conta</a>
   </nav>
 </header>
@@ -150,31 +161,64 @@
     <button onclick="filtrar('fisico')">Físicos</button>
   </div>
 
-  <div class="grid" id="produtos">
-    <!-- produtos entram aqui -->
-  </div>
+  <input 
+    type="text" 
+    id="search" 
+    class="search"
+    placeholder="Buscar por produto, loja ou tipo..."
+    oninput="pesquisar()"
+  >
+
+  <div class="grid" id="produtos"></div>
 
 </div>
 
 <script>
-  // 🔑 KEYS AQUI DEPOIS
-const SUPABASE_URL = "https://dzwerhytdemnwebqurau.supabase.co";
+  // 🔑 KEYS (NÃO ALTERADAS)
+  const SUPABASE_URL = "https://dzwerhytdemnwebqurau.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6d2VyaHl0ZGVtbndlYnF1cmF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NzQ5NzEsImV4cCI6MjA4MjM1MDk3MX0.m0ZEcR_A7uEMJ0ixVThqNcI0lLlc2vCQitcyjtT0MDM";
+
   const supabaseClient = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
 
-  // mock inicial (depois vem do Supabase)
-  const produtosMock = [
-    { nome: "E-book Criativo", tipo: "digital", loja: "Loja X", valor: "R$ 19,90" },
-    { nome: "Preset Fotográfico", tipo: "digital", loja: "Visual Lab", valor: "R$ 29,90" },
-    { nome: "Camiseta Street", tipo: "fisico", loja: "Rua 013", valor: "R$ 79,90" }
-  ];
+  let produtosCache = [];
+
+  async function carregarProdutos() {
+    const { data, error } = await supabaseClient
+      .from("produtos_geral")
+      .select(`
+        nome,
+        tipo,
+        preco,
+        lojas ( nome )
+      `)
+      .eq("status", "permitido");
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    produtosCache = data.map(p => ({
+      nome: p.nome,
+      tipo: p.tipo,
+      loja: p.lojas?.nome || "Loja",
+      valor: `R$ ${Number(p.preco).toFixed(2)}`
+    }));
+
+    render(produtosCache);
+  }
 
   function render(lista) {
-    const box = document.getElementById('produtos');
-    box.innerHTML = '';
+    const box = document.getElementById("produtos");
+    box.innerHTML = "";
+
+    if (!lista.length) {
+      box.innerHTML = "<p>Nenhum produto encontrado</p>";
+      return;
+    }
 
     lista.forEach(p => {
       box.innerHTML += `
@@ -188,15 +232,27 @@ const SUPABASE_URL = "https://dzwerhytdemnwebqurau.supabase.co";
     });
   }
 
-  window.filtrar = function (tipo) {
-    if (tipo === 'todos') {
-      render(produtosMock);
+  window.filtrar = function(tipo) {
+    if (tipo === "todos") {
+      render(produtosCache);
     } else {
-      render(produtosMock.filter(p => p.tipo === tipo));
+      render(produtosCache.filter(p => p.tipo === tipo));
     }
-  }
+  };
 
-  render(produtosMock);
+  window.pesquisar = function() {
+    const termo = document.getElementById("search").value.toLowerCase();
+
+    render(
+      produtosCache.filter(p =>
+        p.nome.toLowerCase().includes(termo) ||
+        p.loja.toLowerCase().includes(termo) ||
+        p.tipo.toLowerCase().includes(termo)
+      )
+    );
+  };
+
+  carregarProdutos();
 </script>
 
 </body>
