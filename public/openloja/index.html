@@ -112,6 +112,17 @@
   );
 // script loja open
   <script>
+  // 🔓 FUNÇÃO GLOBAL
+  window.gerarSlug = function (texto) {
+    return texto
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  };
+</script>
+
+  <script>
   function gerarSlug(texto) {
     return texto
       .toLowerCase()
