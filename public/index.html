@@ -15,6 +15,9 @@
       background: #f6f6f6;
       color: #111;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
     header {
@@ -35,37 +38,38 @@
     }
 
     main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 40px 20px;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .card {
+    .actions {
       background: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,.05);
+      padding: 50px 40px;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.08);
+      max-width: 420px;
+      width: 100%;
     }
 
-    .card h2 {
+    .actions h2 {
       margin-top: 0;
+      font-size: 22px;
+      margin-bottom: 30px;
     }
 
     button {
-      padding: 12px 20px;
+      width: 100%;
+      padding: 18px;
+      font-size: 18px;
+      border-radius: 8px;
       border: none;
-      border-radius: 6px;
       cursor: pointer;
       background: #000;
       color: #fff;
-      font-size: 15px;
-      margin-top: 10px;
+      margin-bottom: 16px;
     }
 
     button.outline {
@@ -75,7 +79,6 @@
     }
 
     footer {
-      margin-top: 40px;
       padding: 20px;
       font-size: 14px;
       color: #666;
@@ -91,48 +94,17 @@
 </header>
 
 <main>
+  <div class="actions">
+    <h2>O que você quer fazer?</h2>
 
-  <!-- AÇÕES PRINCIPAIS -->
-  <section class="grid">
+    <button onclick="handleAction('/openloja')">
+      💼 Quero vender
+    </button>
 
-    <div class="card">
-      <h2>📦 Produtos Digitais</h2>
-      <p>Ebooks, cursos, beats, arquivos e muito mais.</p>
-      <button onclick="location.href='/digitaisproduct'">
-        Ver Digitais
-      </button>
-    </div>
-
-    <div class="card">
-      <h2>📦 Produtos Físicos</h2>
-      <p>Roupas, acessórios, itens artesanais.</p>
-      <button onclick="location.href='/fisicos'">
-        Ver Físicos
-      </button>
-    </div>
-
-    <div class="card">
-      <h2>🏪 Vender na ALMA</h2>
-      <p>Crie sua loja e comece a vender hoje.</p>
-      <button onclick="location.href='/openloja'">
-        Abrir Loja
-      </button>
-    </div>
-
-    <div class="card" id="authCard">
-      <h2>👤 Conta</h2>
-      <p>Entre ou crie sua conta.</p>
-
-      <button onclick="login('google')">Google</button>
-      <button onclick="login('facebook')">Facebook</button>
-      <br>
-      <button class="outline" onclick="location.href='/cadastro'">
-        Criar conta
-      </button>
-    </div>
-
-  </section>
-
+    <button class="outline" onclick="handleAction('/inicio')">
+      🛒 Quero comprar
+    </button>
+  </div>
 </main>
 
 <footer>
@@ -144,13 +116,15 @@
   const SUPABASE_URL = "https://dzwerhytdemnwebqurau.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6d2VyaHl0ZGVtbndlYnF1cmF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NzQ5NzEsImV4cCI6MjA4MjM1MDk3MX0.m0ZEcR_A7uEMJ0ixVThqNcI0lLlc2vCQitcyjtT0MDM";
 
- const supabaseClient = supabase.createClient(
+  const supabaseClient = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
 
-  // 🔓 FUNÇÃO GLOBAL
-  window.login = async function () {
+  // 🔓 LOGIN + REDIRECIONAMENTO
+  async function handleAction(destino) {
+    localStorage.setItem('redirectAfterLogin', destino);
+
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -163,7 +137,6 @@
     }
   }
 </script>
-
 
 </body>
 </html>
