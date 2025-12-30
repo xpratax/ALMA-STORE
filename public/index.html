@@ -121,19 +121,21 @@
     SUPABASE_ANON_KEY
   );
 
-  window.addEventListener('load', async () => {
-    const { data } = await supabaseClient.auth.getSession();
+  // 🔓 FUNÇÃO GLOBAL (AGORA O HTML ENXERGA 😏)
+  window.handleAction = async function (destino) {
+    localStorage.setItem('redirectAfterLogin', destino);
 
-    if (data.session) {
-      const destino = localStorage.getItem('redirectAfterLogin');
-
-      if (destino && destino !== window.location.pathname) {
-        localStorage.removeItem('redirectAfterLogin');
-        window.location.href = destino;
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin + '/inicio'
       }
-    }
-  });
-</script>
+    });
 
+    if (error) {
+      alert(error.message);
+    }
+  }
+</script>
 </body>
 </html>
