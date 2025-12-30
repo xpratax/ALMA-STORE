@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>ALMA STORE | Novo Produto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="icon" href="/favicon.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #12002b, #05000f);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .box {
+      background: rgba(255,255,255,.04);
+      padding: 40px;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 0 30px rgba(157,78,221,.25);
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+      color: #c77dff;
+      letter-spacing: 2px;
+      text-shadow: 0 0 15px #9d4edd;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: none;
+      height: 90px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 14px;
+      background: transparent;
+      border: 2px solid #9d4edd;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(157,78,221,.6);
+      transition: .3s;
+    }
+
+    button:hover {
+      background: #9d4edd;
+      box-shadow: 0 0 30px #9d4edd;
+    }
+
+    .msg {
+      margin-top: 15px;
+      font-size: 14px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+
+  <h1>NOVO PRODUTO</h1>
+
+  <input type="text" id="nome" placeholder="Nome do produto">
+
+  <textarea id="descricao" placeholder="Descrição do produto"></textarea>
+
+  <input type="number" id="valor" placeholder="Valor (R$)">
+
+  <select id="tipo">
+    <option value="">Tipo do produto</option>
+    <option value="digital">Produto Digital</option>
+    <option value="fisico">Produto Físico</option>
+  </select>
+
+  <button onclick="criarProduto()">Enviar para análise</button>
+
+  <div class="msg" id="msg"></div>
+
+</div>
+
+<script>
+  const SUPABASE_URL = "https://dzwerhytdemnwebqurau.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6d2VyaHl0ZGVtbndlYnF1cmF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NzQ5NzEsImV4cCI6MjA4MjM1MDk3MX0.m0ZEcR_A7uEMJ0ixVThqNcI0lLlc2vCQitcyjtT0MDM";
+
+  const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  window.criarProduto = async function () {
+    const nome = document.getElementById("nome").value;
+    const descricao = document.getElementById("descricao").value;
+    const valor = document.getElementById("valor").value;
+    const tipo = document.getElementById("tipo").value;
+    const msg = document.getElementById("msg");
+
+    if (!nome || !valor || !tipo) {
+      msg.innerText = "Preencha todos os campos obrigatórios";
+      msg.style.color = "red";
+      return;
+    }
+
+    msg.innerText = "Enviando para análise...";
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    // 🔍 buscar loja do usuário
+    const { data: loja } = await supabaseClient
+      .from("lojas")
+      .select("id, nome")
+      .eq("user_id", user.id)
+      .single();
+
+    if (!loja) {
+      msg.innerText = "Você precisa criar uma loja primeiro";
+      msg.style.color = "red";
+      return;
+    }
+
+    // 📦 inserir produto na tabela GERAL
+    const { error } = await supabaseClient
+      .from("produtos_geral")
+      .insert([{
+        nome: nome,
+        descricao: descricao,
+        valor: valor,
+        tipo: tipo,
+        loja_id: loja.id,
+        nome_loja: loja.nome,
+        status: "analise"
+      }]);
+
+    if (error) {
+      msg.innerText = error.message;
+      msg.style.color = "red";
+    } else {
+      msg.innerText = "Produto enviado para análise 🖤";
+      msg.style.color = "#9d4edd";
+      document.querySelector("form")?.reset();
+    }
+  }
+</script>
+
+</body>
+</html>
