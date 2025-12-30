@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>ALMA STORE | Minha Loja</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="icon" href="/favicon.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #12002b, #05000f);
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 25px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+
+    header h1 {
+      margin: 0;
+      letter-spacing: 3px;
+      color: #c77dff;
+      text-shadow: 0 0 15px #9d4edd;
+    }
+
+    header p {
+      color: #aaa;
+      margin-top: 5px;
+    }
+
+    .container {
+      padding: 30px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .card {
+      background: rgba(255,255,255,.04);
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 0 25px rgba(157,78,221,.15);
+      margin-bottom: 30px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: #e0aaff;
+      text-shadow: 0 0 10px #9d4edd;
+    }
+
+    .loja-info {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .loja-info img {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #9d4edd;
+      box-shadow: 0 0 15px #9d4edd;
+    }
+
+    .neon-btn {
+      background: transparent;
+      color: #fff;
+      border: 2px solid #9d4edd;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 0 15px rgba(157,78,221,.6);
+      transition: .3s;
+    }
+
+    .neon-btn:hover {
+      background: #9d4edd;
+      box-shadow: 0 0 25px #9d4edd;
+    }
+
+    .produtos {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .produto {
+      background: rgba(255,255,255,.05);
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 0 15px rgba(157,78,221,.15);
+    }
+
+    .produto span {
+      font-size: 13px;
+      color: #bbb;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #777;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>MINHA LOJA</h1>
+  <p>Painel do vendedor • ALMA STORE</p>
+</header>
+
+<div class="container">
+
+  <!-- INFO DA LOJA -->
+  <div class="card">
+    <h2>Dados da Loja</h2>
+    <div class="loja-info">
+      <img id="fotoLoja" src="https://i.postimg.cc/T2BSsDWd/icons8-fantasma-50.png">
+      <div>
+        <h3 id="nomeLoja">Carregando...</h3>
+        <p id="descricaoLoja"></p>
+        <p><span id="slugLoja"></span></p>
+        <button class="neon-btn">Editar Loja</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUTOS -->
+  <div class="card">
+    <h2>Meus Produtos</h2>
+    <button class="neon-btn" onclick="window.location.href='/novo-produto'">
+      + Novo Produto
+    </button>
+
+    <div class="produtos" id="listaProdutos">
+      <!-- produtos -->
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  © 2025 • ALMA STORE • venda com alma
+</footer>
+
+<script>
+  const SUPABASE_URL = "https://dzwerhytdemnwebqurau.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6d2VyaHl0ZGVtbndlYnF1cmF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NzQ5NzEsImV4cCI6MjA4MjM1MDk3MX0.m0ZEcR_A7uEMJ0ixVThqNcI0lLlc2vCQitcyjtT0MDM";
+
+  const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  async function carregarMinhaLoja() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    const { data: loja, error } = await supabaseClient
+      .from("lojas")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
+
+    if (error || !loja) {
+      alert("Nenhuma loja encontrada");
+      return;
+    }
+
+    document.getElementById("nomeLoja").innerText = loja.nome;
+    document.getElementById("descricaoLoja").innerText = loja.descricao || "";
+    document.getElementById("slugLoja").innerText = "almax-store.vercel.app/loja/" + loja.slug;
+    document.getElementById("fotoLoja").src = loja.foto || document.getElementById("fotoLoja").src;
+
+    carregarProdutos(loja.id);
+  }
+
+  async function carregarProdutos(lojaId) {
+    const { data } = await supabaseClient
+      .from("produtos_geral")
+      .select("nome, valor, tipo")
+      .eq("loja_id", lojaId);
+
+    const lista = document.getElementById("listaProdutos");
+
+    if (!data || data.length === 0) {
+      lista.innerHTML = "<p>Nenhum produto cadastrado</p>";
+      return;
+    }
+
+    data.forEach(p => {
+      lista.innerHTML += `
+        <div class="produto">
+          <strong>${p.nome}</strong><br>
+          <span>${p.tipo}</span><br>
+          <span>R$ ${p.valor}</span>
+        </div>
+      `;
+    });
+  }
+
+  carregarMinhaLoja();
+</script>
+
+</body>
+</html>
