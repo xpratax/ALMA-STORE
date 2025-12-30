@@ -110,11 +110,32 @@
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
-
-  async function abrirLoja() {
+// script loja open
+  <script>
+  function gerarSlug(texto) {
+    return texto
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  }
+</script>
+  
+<!--abrirloja-->
+  
+<script>
+  window.abrirLoja = async function () {
     const nomeLoja = document.getElementById('nomeLoja').value;
     const descricao = document.getElementById('descricao').value;
     const msg = document.getElementById('msg');
+
+    if (!nomeLoja) {
+      msg.innerText = "Informe o nome da loja";
+      msg.style.color = "red";
+      return;
+    }
+
+    const slug = gerarSlug(nomeLoja);
 
     msg.innerText = "Criando loja...";
 
@@ -131,6 +152,7 @@
       .insert([{
         user_id: user.id,
         nome: nomeLoja,
+        slug: slug,
         descricao: descricao
       }]);
 
@@ -143,5 +165,6 @@
     }
   }
 </script>
+
 </body>
 </html>
