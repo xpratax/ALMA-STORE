@@ -201,14 +201,15 @@
       return;
     }
 
-    produtosCache = data.map(p => ({
-      nome: p.nome,
-      tipo: p.tipo,
-      loja: p.lojas?.nome || "Loja",
-      const preco = String(p.preco || "0").replace(",", ".");
-valor: `R$ ${parseFloat(preco).toFixed(2)}`
-
-    }));
+  produtosCache = data.map(p => {
+  const preco = String(p.preco || "0").replace(",", ".");
+  return {
+    nome: p.nome,
+    tipo: p.tipo,
+    loja: p.loja || "Minha Loja",
+    valor: `R$ ${parseFloat(preco).toFixed(2)}`
+  };
+});
 
     render(produtosCache);
   }
