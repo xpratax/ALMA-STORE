@@ -112,16 +112,18 @@ async function carregarLoja() {
 
 /* 🛒 CARREGAR PRODUTOS */
 async function carregarProdutos(lojaId) {
-  const { data: produtos, error } = await supabaseClient
-    .from("produtos_geral")
-    .select("nome, preco")
-    .eq("loja_id", lojaId)
-    .eq("status", "permitido");
+    const { data } = await supabaseClient
+      .from("produtos_geral")
+      .select("nome, valor, tipo")
+      .eq("loja_id", lojaId);
 
-  if (error) {
-    console.error(error);
-    return;
-  }
+    const lista = document.getElementById("listaProdutos");
+
+    if (!data || data.length === 0) {
+      lista.innerHTML = "<p>Nenhum produto cadastrado</p>";
+      return;
+    }
+
 
   const box = document.getElementById("listaProdutos");
   box.innerHTML = "";
