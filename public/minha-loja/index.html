@@ -178,6 +178,22 @@
       .select("*")
       .eq("user_id", user.id)
       .single();
+// 🌐 URL base da loja
+const BASE_URL = "https://almax-store.vercel.app/loja/?slug=";
+
+// Nome e descrição (se já tiver, pode ignorar)
+document.getElementById("nomeLoja").innerText = loja.nome;
+document.getElementById("descricaoLoja").innerText = loja.descricao;
+
+// 🔗 Link completo da loja
+const linkCompleto = BASE_URL + loja.slug;
+
+// Mostrar slug como link clicável
+document.getElementById("slugLoja").innerHTML = `
+  <a href="${linkCompleto}" target="_blank" style="color:#8f7cff; word-break: break-all;">
+    ${linkCompleto}
+  </a>
+`;
 
     if (error || !loja) {
       alert("Nenhuma loja encontrada");
