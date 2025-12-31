@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>ALMA STORE | Loja</title>
-<!--gostou? segue no insta @vm_dantasxz-->
-  <!--gostou? segue no insta @vm_dantasxz-->
+<!--segue la @vm_dantasxz
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -39,11 +38,6 @@
       border-radius: 14px;
       padding: 18px;
       box-shadow: 0 0 18px #8f7cff44;
-      transition: transform .2s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
     }
 
     .card h3 {
@@ -62,6 +56,7 @@
       opacity: .6;
       text-align: center;
       margin-top: 40px;
+      grid-column: 1 / -1;
     }
   </style>
 </head>
@@ -92,7 +87,7 @@ if (!slug) {
   document.body.innerHTML = "<h2>Loja não encontrada</h2>";
   throw new Error("Slug não informado");
 }
-/*--gostou? segue no insta @vm_dantasxz-->
+
 /* 🏪 CARREGAR LOJA */
 async function carregarLoja() {
   const { data: loja, error } = await supabaseClient
@@ -112,29 +107,27 @@ async function carregarLoja() {
 
 /* 🛒 CARREGAR PRODUTOS */
 async function carregarProdutos(lojaId) {
-    const { data } = await supabaseClient
-      .from("produtos_geral")
-      .select("nome, valor, tipo")
-      .eq("loja_id", lojaId);
-
-    const lista = document.getElementById("listaProdutos");
-
-    if (!data || data.length === 0) {
-      lista.innerHTML = "<p>Nenhum produto cadastrado</p>";
-      return;
-    }
-
+  const { data, error } = await supabaseClient
+    .from("produtos_geral")
+    .select("nome, preco")
+    .eq("loja_id", lojaId)
+    .eq("status", "permitido");
 
   const box = document.getElementById("listaProdutos");
   box.innerHTML = "";
 
-  if (!produtos || produtos.length === 0) {
-    box.innerHTML = `<div class="vazio">Nenhum produto disponível</div>`;
+  if (error) {
+    box.innerHTML = "<div class='vazio'>Erro ao carregar produtos</div>";
     return;
   }
 
-  produtos.forEach(p => {
-    const precoFormatado =
+  if (!data || data.length === 0) {
+    box.innerHTML = "<div class='vazio'>Nenhum produto disponível</div>";
+    return;
+  }
+
+  data.forEach(p => {
+    const preco =
       p.preco !== null
         ? Number(p.preco).toFixed(2).replace(".", ",")
         : "0,00";
@@ -142,7 +135,7 @@ async function carregarProdutos(lojaId) {
     box.innerHTML += `
       <div class="card">
         <h3>${p.nome}</h3>
-        <div class="preco">R$ ${precoFormatado}</div>
+        <div class="preco">R$ ${preco}</div>
       </div>
     `;
   });
@@ -153,4 +146,3 @@ carregarLoja();
 
 </body>
 </html>
-<!--gostou? segue no insta @vm_dantasxz-->
