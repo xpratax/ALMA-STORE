@@ -185,32 +185,34 @@
 
   let produtosCache = [];
 
-  async function carregarProdutos() {
-    const { data, error } = await supabaseClient
-      .from("produtos_geral")
-      .select(`
-        nome,
-        tipo,
-        preco,
-        lojas ( nome )
-      `)
-      .eq("status", "permitido");
+async function carregarProdutos() {
+  const { data, error } = await supabaseClient
+    .from("produtos_geral")
+    .select(`
+      nome,
+      tipo,
+      preco,
+      lojas:loja_id (
+        nome
+      )
+    `)
+    .eq("status", "permitido");
 
-    if (error) {
-      console.error(error);
-      return;
-    }
-
- produtosCache = data.map(p => ({
-  nome: p.nome,
-  tipo: p.tipo,
-  loja: "Minha Loja",
-  valor: `R$ ${Number(p.preco).toFixed(2)}`
-}));
-
-
-    render(produtosCache);
+  if (error) {
+    console.error("Erro ao carregar produtos:", error);
+    return;
   }
+
+  produtosCache = data.map(p => ({
+    nome: p.nome,
+    tipo: p.tipo,
+    loja: p.lojas ? p.lojas.nome : "SEM LOJA",
+    valor: p.preco ? `R$ ${Number(p.preco).toFixed(2)}` : "Preço indisponível"
+  }));
+
+  render(produtosCache);
+}
+
 
   function render(lista) {
     const box = document.getElementById("produtos");
