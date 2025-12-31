@@ -2,8 +2,9 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Minha Loja</title>
-
+  <title>ALMA STORE | Loja</title>
+<!--gostou? segue no insta @vm_dantasxz-->
+  <!--gostou? segue no insta @vm_dantasxz-->
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -18,12 +19,13 @@
 
     .loja-header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
     }
 
     .loja-header h1 {
       font-size: 2.4rem;
       color: #8f7cff;
+      margin: 0;
     }
 
     .produtos {
@@ -34,19 +36,32 @@
 
     .card {
       background: #12121a;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 0 15px #8f7cff44;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 0 18px #8f7cff44;
+      transition: transform .2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
     }
 
     .card h3 {
-      margin: 0 0 8px;
+      margin: 0 0 10px;
+      font-size: 16px;
     }
 
     .preco {
       margin-top: 10px;
       font-weight: bold;
       color: #00ffcc;
+      font-size: 15px;
+    }
+
+    .vazio {
+      opacity: .6;
+      text-align: center;
+      margin-top: 40px;
     }
   </style>
 </head>
@@ -64,12 +79,12 @@
 const SUPABASE_URL = "https://dzwerhytdemnwebqurau.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6d2VyaHl0ZGVtbndlYnF1cmF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NzQ5NzEsImV4cCI6MjA4MjM1MDk3MX0.m0ZEcR_A7uEMJ0ixVThqNcI0lLlc2vCQitcyjtT0MDM";
 
-const supabase = window.supabase.createClient(
+const supabaseClient = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
-/* 📌 PEGAR SLUG DA URL */
+/* 📌 SLUG DA URL */
 const params = new URLSearchParams(window.location.search);
 const slug = params.get("slug");
 
@@ -77,10 +92,10 @@ if (!slug) {
   document.body.innerHTML = "<h2>Loja não encontrada</h2>";
   throw new Error("Slug não informado");
 }
-
-/* 🔎 BUSCAR LOJA PELO SLUG */
+/*--gostou? segue no insta @vm_dantasxz-->
+/* 🏪 CARREGAR LOJA */
 async function carregarLoja() {
-  const { data: loja, error } = await supabase
+  const { data: loja, error } = await supabaseClient
     .from("lojas")
     .select("id, nome")
     .eq("slug", slug)
@@ -92,13 +107,12 @@ async function carregarLoja() {
   }
 
   document.getElementById("nomeLoja").innerText = loja.nome;
-
   carregarProdutos(loja.id);
 }
 
-/* 🛒 BUSCAR PRODUTOS DA LOJA */
+/* 🛒 CARREGAR PRODUTOS */
 async function carregarProdutos(lojaId) {
-  const { data: produtos, error } = await supabase
+  const { data: produtos, error } = await supabaseClient
     .from("produtos_geral")
     .select("nome, preco")
     .eq("loja_id", lojaId)
@@ -112,11 +126,21 @@ async function carregarProdutos(lojaId) {
   const box = document.getElementById("listaProdutos");
   box.innerHTML = "";
 
+  if (!produtos || produtos.length === 0) {
+    box.innerHTML = `<div class="vazio">Nenhum produto disponível</div>`;
+    return;
+  }
+
   produtos.forEach(p => {
+    const precoFormatado =
+      p.preco !== null
+        ? Number(p.preco).toFixed(2).replace(".", ",")
+        : "0,00";
+
     box.innerHTML += `
       <div class="card">
         <h3>${p.nome}</h3>
-        <div class="preco">R$ ${Number(p.preco).toFixed(2)}</div>
+        <div class="preco">R$ ${precoFormatado}</div>
       </div>
     `;
   });
@@ -127,3 +151,4 @@ carregarLoja();
 
 </body>
 </html>
+<!--gostou? segue no insta @vm_dantasxz-->
