@@ -205,7 +205,9 @@
       nome: p.nome,
       tipo: p.tipo,
       loja: p.lojas?.nome || "Loja",
-      valor: `R$ ${Number(p.preco).toFixed(2)}`
+      const preco = String(p.preco || "0").replace(",", ".");
+valor: `R$ ${parseFloat(preco).toFixed(2)}`
+
     }));
 
     render(produtosCache);
